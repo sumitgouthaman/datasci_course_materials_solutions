@@ -1,12 +1,28 @@
 import oauth2 as oauth
 import urllib2 as urllib
+import sys
+import json
 
 # See assignment1.html instructions or README for how to get these credentials
 
-api_key = "<Enter api key>"
-api_secret = "<Enter api secret>"
-access_token_key = "<Enter your access token key here>"
-access_token_secret = "<Enter your access token secret here>"
+# Modifed to read keys in a json format from another
+# So that the other file can be ignored from git
+
+try:
+  keys_file = open("~twitter_api_keys.txt", "r")
+  keys_json = json.loads(keys_file.read())
+except IOError:
+  print "File ~twitter_api_keys.txt not found or not in proper format!"
+  sys.exit(1)
+
+try:
+  api_key = keys_json[u'api_key']
+  api_secret = keys_json[u'api_secret']
+  access_token_key = keys_json[u'token_key']
+  access_token_secret = keys_json[u'token_secret']
+except KeyError:
+  print "Required keys not found in json from ~twitter_api_keys.txt"
+  sys.exit(1)
 
 _debug = 0
 
@@ -51,7 +67,7 @@ def twitterreq(url, method, parameters):
   return response
 
 def fetchsamples():
-  url = "https://stream.twitter.com/1/statuses/sample.json"
+  url = "https://stream.twitter.com/1/statuses/sample.json?lang=en"
   parameters = []
   response = twitterreq(url, "GET", parameters)
   for line in response:
